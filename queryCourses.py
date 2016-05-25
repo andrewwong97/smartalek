@@ -1,11 +1,12 @@
 import requests
 import json
+import os
 from datetime import date
 
 
-def getCurrentTerm():
+def getNextTerm():
 	"""
-	Usage: getCurrentTerm() - uses current date to find the next term.
+	Usage: getNextTerm() - uses current date to find the next term.
 	Currently does not support Intersession or Summer.
 
 	Returns a string of current term
@@ -19,31 +20,52 @@ def getCurrentTerm():
 	elif currentMonth >= 9 and currentMonth < 13:
 		return "Spring " + nextYear
 
-def queryCourses(currentTerm):
+def getCurrentCatalog():
 	"""
-	Returns list of all current courses web IDs in WSE and KSAS
+	Caches current term response.json course catalog
 	"""
+	catalog = []
 	schools = ["Whiting School of Engineering", "Krieger School of Arts and Sciences"]
 	api_key = "Y7YXSplpQcXOWoyB4Z61tki74wNqHu8S"
 
-	catalog = []
 	for school in schools:
 		r = requests.get("https://isis.jhu.edu/api/classes/" + school + \
-			"/" + currentTerm + "?key=" + api_key)
-		data = json.loads(r.content)
-		for i in data:
-			if i["SSS_SectionsID"] not in catalog:
-				catalog.append(i["SSS_SectionsID"])
-	return catalog
+			"/" + getNextTerm() + "?key=" + api_key)
+		response = json.loads(r.content)
+		for i in response:
+			if i not in catalog:
+				catalog.append(i)
+	with open("response.json",'wb') as f:
+		f.write(json.dumps(catalog))
+	f.close()
 
-def queryToList():
-	catalog = queryCourses(getCurrentTerm())
-	return catalog
+def respToDict():
+	"""
+	Returns dict of all current courses and their web IDs in WSE and KSAS
+	"""
+	catalog = {}
+
+	if "response.json" not in os.listdir(os.getcwd()):
+		getCurrentCatalog()
+		respToDict()
+	else:
+		response = json.loads(open("response.json").read())
+		for i in response:
+			if i["OfferingName"] not in catalog.keys():
+				catalog[i["OfferingName"]] = i["SSS_SectionsID"]
+		return catalog
+
 
 def queryToFile():
-	catalog = queryCourses(getCurrentTerm())
-	with open("out.txt", "wb") as f:
-		for i in catalog:
-			f.write(i + "\n")
-			print i
-	f.close()
+	term = getNextTerm()
+	catalog = respToDict()
+	if catalog!=-1:
+		with open(term.replace(" ","")+".txt", "wb") as f:
+			try:
+				for key in catalog:
+					f.write(key + " " + catalog[key] + "\n")
+			except Exception:
+				pass
+		f.close()
+
+queryToFile()

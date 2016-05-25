@@ -10,8 +10,9 @@ from bs4 import BeautifulSoup
 
 
 def openIDFile(path):
-	IDs = open(str(path)).readlines()
-	return IDs
+	lines = open(str(path)).readlines()
+	data = [i.split(" ") for i in lines]
+	return data
 
 def getCourseID(classNumber):
 	"""
@@ -57,16 +58,17 @@ def getCourseInfo(idNum):
 	return prereqs
 
 def main():
-	"""
-	Need list of Course IDs: AS.050.110 or EN.600.120
-	1. courses = [i[:-1] for i in courseFileList('out.txt')]
-	"""
-	idList = [i[:-1] for i in openIDFile('out.txt')]
-	prereqs = getCourseInfo('488440')
-	print "Prerequisites for 488440: ", prereqs
+	# -1 for chopping newline escape
+	courses = {}
+	for i in openIDFile('Fall2016.txt'):
+		courses[i[0]] = i[1][:-1]
+	for key in courses:
+		print "%s requires: "%key, getCourseInfo(courses[key])
+
+
+
 
 	
-
 start = timeit.default_timer()
 main()
 print "Runtime: " + str(timeit.default_timer()-start)[:4] + ' seconds'
