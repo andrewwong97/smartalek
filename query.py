@@ -51,7 +51,8 @@ def respToDict():
 	else:
 		response = json.loads(open("response.json").read())
 		for i in response:
-			if i["OfferingName"] not in catalog.keys():
+			if i["OfferingName"] not in catalog.keys() and \
+			 i["Level"]=="Lower Level Undergraduate" or i["Level"]=="Upper Level Undergraduate":
 				catalog[i["OfferingName"]] = i["SSS_SectionsID"]
 		return catalog
 
