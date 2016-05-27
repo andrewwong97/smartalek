@@ -39,32 +39,41 @@ def getCurrentCatalog():
 		f.write(json.dumps(catalog))
 	f.close()
 
-def respToDict():
+def createCatalog():
 	"""
-	Returns dict of all current courses and their web IDs in WSE and KSAS
+	Returns list of all current courses and their attributes in WSE and KSAS undergrad
 	"""
-	catalog = {}
+	catalog = []
+	temp = []
+	response = []
 
-	if "response.json" not in os.listdir(os.getcwd()):
-		getCurrentCatalog()
-		respToDict()
-	else:
+	try:
 		response = json.loads(open("response.json").read())
-		for i in response:
-			if i["OfferingName"] not in catalog.keys() and \
-			 i["Level"]=="Lower Level Undergraduate" or i["Level"]=="Upper Level Undergraduate":
-				catalog[i["OfferingName"]] = i["SSS_SectionsID"]
-		return catalog
+	except Exception or response[0]["Term_IDR"] != getNextTerm():
+		getCurrentCatalog()
+		createCatalog()
+
+	for i in response:
+		if i["OfferingName"] not in temp and i["Level"]=="Lower Level Undergraduate" or i["Level"]=="Upper Level Undergraduate":
+			catalog.append({
+				"Number": i["OfferingName"],
+				"ID": i["SSS_SectionsID"],
+				"Title": i["Title"],
+				"Location": i["Location"],
+				"Credits": i["Credits"],
+				"Level": i["Level"]
+			})
+			temp.append(i["OfferingName"])
+	return catalog
 
 
 def queryToFile():
 	term = getNextTerm()
-	catalog = respToDict()
+	catalog = createCatalog()
 	if catalog!=-1:
-		with open(term.replace(" ","")+".txt", "wb") as f:
+		with open(term.replace(" ","")+".json", "wb") as f:
 			try:
-				for key in catalog:
-					f.write(key + " " + catalog[key] + "\n")
+				f.write(json.dumps(catalog))
 			except Exception:
 				pass
 		f.close()
