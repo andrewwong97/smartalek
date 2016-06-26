@@ -1,0 +1,42 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+    <ul>
+        <div class="container">
+            <div class="card blue">
+                <div class="row">
+                    <div class="card-content white-text">
+                        <span class="card-title white-text">{{ course.title }}</span>
+                        <p>{{ course.number }}</p>
+                        <p>Credits: {{ course.credits }}</p>
+                        {% for instructor in course.instructors %}
+                            <p>{{ instructor }}</p>
+                        {% endfor %}
+                        <p>{{ course.level }}</p>
+                        <p>{{ course.location }}</p>
+                        {% if course.prerequisites.count == 0 %}
+                        <p>Prerequisites: None</p>
+                        {% else %}
+                            <p>Prerequisites: </p><br>
+                        {% endif %}
+                        {% for p in course.prerequisites.all %}
+                            <a class="waves-effect waves-light btn blue accent-1 prerequisite" href={% url 'app:detail' p.id %}>
+                                {{ p.number }} {{ p.title }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                    <div class="row"></div>
+                    <div class="card-action">
+                        <a class="btn blue darken-4" href="#">Add to My Courses</a>
+                        <a class="waves-light btn back blue darken-4" href="./..#{{ course.id }}">Back</a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </ul>
+
+    {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
+
+{% endblock %}

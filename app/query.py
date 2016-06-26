@@ -7,6 +7,7 @@ from datetime import date
 def getNextTerm():
 	"""
 	Usage: getNextTerm() - uses current date to find the next term.
+	Dates are based on course selection periods.
 	Currently does not support Intersession or Summer.
 
 	Returns a string of current term
@@ -15,9 +16,11 @@ def getNextTerm():
 	currentYear = date.today().strftime("%Y")[0:4]
 	nextYear = str(int(currentYear)+1)
 
-	if currentMonth >= 1 and currentMonth < 9:
+	if currentMonth >= 3 and currentMonth < 11:
+		# [3,10]
 		return "Fall " + currentYear
-	elif currentMonth >= 9 and currentMonth < 13:
+	elif (currentMonth >= 11 and currentMonth < 13) or currentMonth < 3:
+		# [11,12] and [1,2]
 		return "Spring " + nextYear
 
 def getCurrentCatalog():

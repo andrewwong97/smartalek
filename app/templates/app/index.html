@@ -1,0 +1,32 @@
+{% extends "app/layout.html" %}
+
+{% block content %}
+    <h3>Smart Alek</h3>
+    <h4>Select a course for more details: </h4>
+    <h5>Dark Blue: has prerequisites, Light Blue: no prerequisites</h5>
+    <div class="row">
+        <h6 class="btn blue darken-4 white-text">Click to toggle base courses</h6>
+    </div>
+    {% if current_catalog %}
+        <div class="row">
+        {% for course in current_catalog %}
+            {% if course.prerequisites.count > 0 %}
+                <a class="btn home-card blue accent-2" id="{{ course.id }}" href="{% url "app:detail" course.id %}">
+                    {{ course.number }} {{ course.title }}
+                </a>
+            {% elif course.title %}
+                <a class="btn home-card blue accent-1" id="{{ course.id }}" href="{% url "app:detail" course.id %}">
+                    {{ course.number }} {{ course.title }}
+                </a>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% else %}
+        <p>No data for next semester courses yet. Check back about a month before course registration.</p>
+    {% endif %}
+{% endblock %}
+
+
+{# Surround with: alt option T #}
+{# Smart complete: ctrl command space #}
+{# Basic complete: command space #}
