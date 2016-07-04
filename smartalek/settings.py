@@ -88,7 +88,7 @@ DATABASES = {
 }
 
 FIXTURE_DIRS = [
-    'app/cache'
+    'app/coursedata'
 ]
 
 
